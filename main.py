@@ -41,8 +41,8 @@ class Object(pygame.sprite.Sprite):
 
     def collide(self, spriteGroup):
         if pygame.sprite.spritecollide(self, spriteGroup, False):
-            self.xmove = abs(self.xmove)
-            self.ymove = abs(self.ymove)
+            self.xmove += abs(self.xmove)
+            self.ymove += abs(self.ymove)
 
 class Game():
     def __init__(self):
@@ -72,6 +72,26 @@ class Game():
             scissor.movement()
             self.screen.blit(scissor.image, (scissor.x, scissor.y))
 
+    def reset(self):
+        self.rockgroup.empty()
+        self.papergroup.empty()
+        self.scissorgroup.empty()
+        for i in range(self.num):
+            self.rockgroup.add(Object('ROCK', random.randint(50, 650), random.randint(50, 500)))
+            self.scissorgroup.add(Object('SCISSOR', random.randint(50, 650), random.randint(50, 500)))
+            self.papergroup.add(Object('PAPER', random.randint(50, 650), random.randint(50, 500)))
+
+    def winner(self):
+        if len(self.papergroup) == 0 and len(self.scissorgroup) == 0:
+            print('ROCK')
+            self.reset()
+        elif len(self.rockgroup) == 0 and len(self.scissorgroup) == 0:
+            print('PAPER')
+            self.reset()
+        elif len(self.papergroup) == 0 and len(self.rockgroup) == 0:
+            print('SCISSOR')
+            self.reset()
+
     def collisison(self):
         for paper in self.papergroup:
             if pygame.sprite.spritecollide(paper, self.rockgroup, True):
@@ -96,11 +116,11 @@ class Game():
             scissor.collide(self.papergroup)
             self.scissorgroup.add(scissor)
         self.scissorgroup.update()
-   
 
     def play(self):
         self.display()
         self.collisison()
+        self.winner()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
